@@ -276,6 +276,11 @@ main{padding-top:22px}
 .add-c.ok{background:var(--yellow);color:var(--green-3)}
 .note{margin:14px 6px 0;font-size:13px;opacity:.85}
 
+/* ============ BANNER TEMPORAL (Halloween) ============ */
+.tbanner{display:block;margin-top:20px;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#141414;line-height:0}
+.tbanner img{width:100%;height:auto;display:block}
+@media (min-width:760px){.tbanner{margin-top:28px}}
+@media (hover:hover){.tbanner{transition:transform 160ms var(--ease-out)}.tbanner:hover{transform:translateY(-2px)}}
 /* ============ PROMO DE LA SEMANA ============ */
 .promos{display:grid;gap:16px}
 .promo{display:grid;grid-template-columns:1fr;gap:6px;background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:10px;box-shadow:var(--shadow)}
@@ -621,6 +626,9 @@ body.open{overflow:hidden}
 </div>
 
 <main class="wrap" id="main">
+  <a class="tbanner" id="tbanner" href="#s-combos" data-until="2026-11-01T05:00:00Z" aria-label="Fiesta del 31: deditos x10 a $14.000. Ver el combo de Halloween">
+    <img src="assets/banner-halloween.jpg" alt="¿Fiesta del 31? Dedos de bruja: deditos x10 a $14.000 de jamón, hawaiano, arequipe o bocadillo" width="1536" height="1024" loading="eager">
+  </a>
   <section class="slab s-yellow" id="s-promo" data-sec>
     <div class="sh"><h2>Promo<span class="br">de la semana</span></h2></div>
     <div class="promos" id="promos"></div>
@@ -978,6 +986,8 @@ function renderCombos(){
       <div class="foot"><span><small>${c.items.length} productos</small><span class="price">${fmt(tot)}</span></span><button type="button" class="add-c press" data-combo="${c.id}">${ico("plus")}Agregar</button></div></article>`;
   }).join("");
 }
+/* banner temporal: se oculta solo cuando vence */
+(()=>{const b=document.getElementById("tbanner");if(b&&b.dataset.until&&Date.now()>=Date.parse(b.dataset.until))b.remove()})();
 renderFeat(); renderPromos(); renderLonch(); renderCombos(); renderCats(); renderBiz();
 $$("[data-emblem]").forEach(el=>el.src=$("#logo").src);
 $("#yr").textContent=new Date().getFullYear();
