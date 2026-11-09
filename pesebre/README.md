@@ -26,9 +26,9 @@ Si `escena.jpg` no existe, la página usa la imagen directamente desde OpenArt. 
 | PC o portátil con **Google Chrome** o **Microsoft Edge** | Muestra el pesebre, escucha y habla |
 | Pantalla USB-C conectada al PC | Muestra el pesebre en grande |
 | Micrófono (el del portátil sirve; mejor uno USB o de diadema) | Escuchar a las personas |
-| Parlante o bafle | Que el Ángel se escuche en la tienda |
+| Parlante o bafle | Que los personajes se escuchen en la tienda |
 | Internet | El reconocimiento de voz de Chrome y la IA lo necesitan |
-| Kit LAFVIN (opcional) | Un segundo personaje que habla por su cuenta (ver `personaje-xiaozhi.md`) |
+| Kit LAFVIN (opcional) | Escucha y hace hablar a los personajes con la IA de Xiaozhi (ver `personaje-xiaozhi.md`) |
 
 ## Cómo ponerlo a funcionar (5 minutos)
 
