@@ -1,6 +1,23 @@
 # 🎄 Pesebre interactivo · Congelados Montañeros
 
-Un pesebre animado en la pantalla donde las personas **le hablan al Ángel y él les responde con voz**.
+Un pesebre en la pantalla donde las personas **hablan con los personajes**: dicen "Hola Virgen María" y responde María; "Hola San José", y responde José. También hablan el Ángel y el Pastorcito (el único que recomienda productos de la tienda).
+
+Hay **dos formas de usarlo** (se pueden combinar):
+
+| Forma | Quién escucha y habla | Pantalla |
+|---|---|---|
+| **A. Con el kit LAFVIN (ESP32 + IA Xiaozhi)** | El ESP32 | La página en **modo fondo**: `.../pesebre/?modo=fondo` |
+| **B. Solo con el PC** | El PC con micrófono y parlante | La página normal: `.../pesebre/` |
+
+Para la forma A sigue **`personaje-xiaozhi.md`**.
+
+## La imagen del pesebre
+
+La escena es una ilustración generada con IA. Para que no dependa de internet:
+1. Abre la imagen en tu cuenta de OpenArt (proyecto por defecto) y descárgala.
+2. Guárdala en esta carpeta con el nombre **`escena.jpg`** y súbela al repositorio.
+
+Si `escena.jpg` no existe, la página usa la imagen directamente desde OpenArt. La versión gratis trae marca de agua; para quitarla hay que descargarla desde un plan pago o usar otra imagen. **Cualquier foto o dibujo horizontal (16:9) guardado como `escena.jpg` sirve**, incluso una foto del pesebre real de la tienda.
 
 ## Qué se necesita
 
@@ -19,7 +36,7 @@ Un pesebre animado en la pantalla donde las personas **le hablan al Ángel y él
    **https://congeladosmontaneros-dev.github.io/catalogo/pesebre/**
 2. Arrastra la ventana a la pantalla USB-C y presiona **F** para ponerla en pantalla completa.
 3. Toca **"Toca y habla"** (o la barra espaciadora). La primera vez Chrome pide permiso para usar el micrófono: dale **Permitir**.
-4. Habla. El Ángel responde con texto y con voz.
+4. Habla. Responde el personaje que saludaste, con texto y con voz. Cada personaje tiene un tono de voz distinto.
 
 Sin configurar nada funciona en **modo básico**, con respuestas ya escritas sobre la novena, villancicos, horarios y pedidos.
 

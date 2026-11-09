@@ -14,35 +14,31 @@
   html,body{height:100%;overflow:hidden;background:var(--noche1);color:var(--crema);
     font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;user-select:none}
   #escena{position:fixed;inset:0;width:100%;height:100%}
-  /* ---------- Animaciones de la escena ---------- */
-  .tw{animation:titilar 3s ease-in-out infinite}
-  @keyframes titilar{0%,100%{opacity:.25}50%{opacity:1}}
-  #estrella{transform-origin:800px 120px;animation:latido 4s ease-in-out infinite}
-  @keyframes latido{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-  #rayos{transform-origin:800px 120px;animation:girar 60s linear infinite}
-  @keyframes girar{to{transform:rotate(360deg)}}
-  #fugaz{animation:fugaz 9s ease-in infinite;opacity:0}
-  @keyframes fugaz{0%,82%{transform:translate(0,0);opacity:0}85%{opacity:1}100%{transform:translate(-520px,260px);opacity:0}}
-  #angel{animation:flotar 5s ease-in-out infinite}
-  @keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-  .ala{transform-box:fill-box}
-  #alaIzq{transform-origin:100% 30%}
-  #alaDer{transform-origin:0% 30%}
-  .hablando #alaIzq{animation:aleteoI .5s ease-in-out infinite}
-  .hablando #alaDer{animation:aleteoD .5s ease-in-out infinite}
-  @keyframes aleteoI{50%{transform:rotate(-14deg)}}
-  @keyframes aleteoD{50%{transform:rotate(14deg)}}
-  #auraAngel{opacity:.35;transition:opacity .4s}
-  .hablando #auraAngel,.escuchando #auraAngel{opacity:1;animation:aura 1.2s ease-in-out infinite}
-  @keyframes aura{50%{transform:scale(1.15)}}
-  #auraAngel{transform-box:fill-box;transform-origin:center}
-  .bombillo{animation:bombillo 1.6s steps(1) infinite}
-  @keyframes bombillo{50%{opacity:.2}}
-  #luzPesebre{animation:vela 3s ease-in-out infinite}
-  @keyframes vela{50%{opacity:.75}}
+  /* ---------- Escena (ilustración) ---------- */
+  #escena{position:fixed;inset:0;overflow:hidden;background:#0a1030}
+  #fondo{position:absolute;inset:-3%;background-image:url("escena.jpg"),url("https://cdn.openart.ai/watermarked_images/hRLhb0RPu1SLgMeFKA2e/thumbnail_413dadd7_1794266518944.webp");
+    background-size:cover;background-position:center;animation:respirar 40s ease-in-out infinite alternate}
+  @keyframes respirar{from{transform:scale(1) translate(0,0)}to{transform:scale(1.06) translate(-1%,-1%)}}
+  #halo{position:absolute;inset:0;pointer-events:none;opacity:.0;transition:opacity .5s;
+    background:radial-gradient(ellipse at 60% 45%,#ffe9a855 0%,#ffd76a22 35%,transparent 65%)}
+  .hablando #halo{opacity:1;animation:halo 1.4s ease-in-out infinite}
+  .escuchando #halo{opacity:.6;background:radial-gradient(ellipse at 60% 45%,#9fd3ff44 0%,transparent 60%)}
+  @keyframes halo{50%{opacity:.55}}
+  #vineta{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,#0008 100%)}
+  .chispa{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 8px 2px #fff8d0;
+    animation:chispa 3s ease-in-out infinite;pointer-events:none}
+  @keyframes chispa{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
   .copo{position:fixed;top:-10px;color:#fff;opacity:.7;pointer-events:none;animation:caer linear infinite}
   @keyframes caer{to{transform:translateY(110vh) translateX(40px)}}
-
+  #quienHabla{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:5;background:#0b1233dd;border:2px solid var(--oro);
+    color:var(--oro);font-weight:800;font-size:clamp(16px,1.8vw,24px);padding:8px 22px;border-radius:999px;opacity:0;transition:opacity .4s}
+  .hablando #quienHabla{opacity:1}
+  /* Modo fondo: la voz la pone el ESP32 (Xiaozhi); la pantalla solo muestra la escena */
+  .modo-fondo #panelHabla,.modo-fondo #burbuja,.modo-fondo #btnConfig,.modo-fondo #quienHabla{display:none!important}
+  #letreroFondo{display:none}
+  .modo-fondo #letreroFondo{display:block;position:fixed;left:50%;bottom:4vh;transform:translateX(-50%);z-index:5;text-align:center;
+    background:#0b1233dd;border:2px solid var(--oro);border-radius:22px;padding:14px 30px;font-size:clamp(18px,2.2vw,32px);font-weight:800}
+  .modo-fondo #letreroFondo small{display:block;font-weight:500;font-size:.6em;color:var(--oro);margin-top:4px}
   /* ---------- Interfaz ---------- */
   header{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:14px;
     padding:14px 22px;background:linear-gradient(#0009,#0000);z-index:5}
@@ -95,142 +91,24 @@
 <body>
 
 <!-- ======================= ESCENA DEL PESEBRE ======================= -->
-<svg id="escena" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-  <defs>
-    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#050922"/><stop offset=".55" stop-color="#16225a"/><stop offset="1" stop-color="#3a3f86"/>
-    </linearGradient>
-    <radialGradient id="brillo" cx=".5" cy=".5" r=".5">
-      <stop offset="0" stop-color="#fff8d0"/><stop offset=".25" stop-color="#ffd76a" stop-opacity=".8"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="calido" cx=".5" cy=".6" r=".6">
-      <stop offset="0" stop-color="#ffcf7a" stop-opacity=".95"/><stop offset=".6" stop-color="#ff9f3a" stop-opacity=".35"/><stop offset="1" stop-color="#ff9f3a" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="aura" cx=".5" cy=".5" r=".5">
-      <stop offset="0" stop-color="#fffbe6" stop-opacity=".9"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="madera" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#5a3517"/><stop offset=".5" stop-color="#7a4a22"/><stop offset="1" stop-color="#4d2c12"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="1600" height="900" fill="url(#cielo)"/>
-  <g id="estrellas"></g>
-  <g id="fugaz"><line x1="1450" y1="60" x2="1520" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-
-  <!-- Estrella de Belén -->
-  <circle cx="800" cy="120" r="170" fill="url(#brillo)" opacity=".55"/>
-  <g id="rayos" opacity=".35">
-    <path d="M800 120 L770 -200 L830 -200Z M800 120 L1120 90 L1120 150Z M800 120 L830 440 L770 440Z M800 120 L480 150 L480 90Z" fill="#ffe7a0"/>
-  </g>
-  <g id="estrella">
-    <path d="M800 50 L815 105 L870 120 L815 135 L800 190 L785 135 L730 120 L785 105Z" fill="#fff6c9"/>
-    <path d="M800 85 L808 112 L835 120 L808 128 L800 155 L792 128 L765 120 L792 112Z" fill="#fff"/>
-  </g>
-  <!-- Rayo de luz hacia el pesebre -->
-  <path d="M790 150 L700 640 L900 640 L810 150Z" fill="#ffe9a8" opacity=".07"/>
-
-  <!-- Montañas del Quindío -->
-  <path d="M0 560 Q160 430 330 520 T680 480 T1020 510 T1340 450 T1600 520 V900 H0Z" fill="#1b2a5c"/>
-  <path d="M0 620 Q200 520 420 600 T860 570 T1250 600 T1600 580 V900 H0Z" fill="#163a3a"/>
-  <!-- Palmas de cera -->
-  <g stroke="#0e2a26" stroke-width="5" fill="#0e2a26">
-    <line x1="170" y1="610" x2="185" y2="400"/><path d="M185 400 q-50 -10 -80 25 q45 -15 80 -20 q-30 -40 -10 -70 q10 40 15 65 q30 -40 70 -40 q-40 20 -60 45 q50 0 70 30 q-40 -20 -85 -30Z"/>
-    <line x1="1390" y1="600" x2="1375" y2="370"/><path d="M1375 370 q-50 -10 -80 25 q45 -15 80 -20 q-30 -40 -10 -70 q10 40 15 65 q30 -40 70 -40 q-40 20 -60 45 q50 0 70 30 q-40 -20 -85 -30Z"/>
-    <line x1="1490" y1="620" x2="1500" y2="450"/><path d="M1500 450 q-40 -8 -64 20 q36 -12 64 -16 q-24 -32 -8 -56 q8 32 12 52 q24 -32 56 -32 q-32 16 -48 36 q40 0 56 24 q-32 -16 -68 -24Z"/>
-  </g>
-  <!-- Suelo -->
-  <path d="M0 700 Q400 660 800 690 T1600 680 V900 H0Z" fill="#0f2b22"/>
-
-  <!-- ===== Pesebre (establo) ===== -->
-  <ellipse id="luzPesebre" cx="800" cy="600" rx="420" ry="230" fill="url(#calido)"/>
-  <g id="establo">
-    <polygon points="520,470 1080,470 1080,720 520,720" fill="#2a170a"/>
-    <rect x="530" y="470" width="26" height="250" fill="url(#madera)"/>
-    <rect x="1044" y="470" width="26" height="250" fill="url(#madera)"/>
-    <!-- Techo de paja -->
-    <polygon points="470,480 800,300 1130,480 1100,500 800,335 500,500" fill="#b07a2a"/>
-    <polygon points="470,480 800,300 1130,480" fill="none" stroke="#7a5214" stroke-width="10" stroke-linejoin="round"/>
-    <g stroke="#d9a54a" stroke-width="3" opacity=".6">
-      <line x1="560" y1="440" x2="600" y2="420"/><line x1="640" y1="400" x2="690" y2="372"/><line x1="900" y1="372" x2="950" y2="400"/><line x1="1000" y1="420" x2="1040" y2="440"/>
-    </g>
-    <!-- Alumbrado navideño -->
-    <g id="bombillos"></g>
-  </g>
-
-  <!-- Buey y mula -->
-  <g>
-    <ellipse cx="985" cy="600" rx="70" ry="45" fill="#6b4a32"/>
-    <ellipse cx="930" cy="575" rx="34" ry="28" fill="#7a5638"/>
-    <path d="M905 552 q-14 -24 -2 -36 M952 552 q14 -24 2 -36" stroke="#e8dcc0" stroke-width="7" fill="none" stroke-linecap="round"/>
-    <circle cx="920" cy="572" r="4" fill="#111"/><ellipse cx="912" cy="592" rx="12" ry="8" fill="#a07a58"/>
-    <ellipse cx="640" cy="605" rx="62" ry="40" fill="#7c7c86"/>
-    <ellipse cx="690" cy="575" rx="26" ry="32" fill="#8b8b95"/>
-    <path d="M680 548 l-8 -38 l14 4z M700 548 l6 -38 l-14 6z" fill="#8b8b95"/>
-    <circle cx="696" cy="570" r="4" fill="#111"/><ellipse cx="700" cy="598" rx="12" ry="9" fill="#b5b5bd"/>
-  </g>
-
-  <!-- José -->
-  <g>
-    <path d="M915 720 L935 560 Q955 520 985 560 L1005 720Z" fill="#7a4b26"/>
-    <path d="M930 600 L1010 610 L1000 640 L925 630Z" fill="#a8743f" opacity=".7"/>
-    <circle cx="960" cy="525" r="26" fill="#e3b38a"/>
-    <path d="M934 520 Q960 470 986 520 L990 560 Q960 545 930 560Z" fill="#b8865a"/>
-    <path d="M944 535 Q960 565 976 535 Q972 550 960 556 Q948 550 944 535Z" fill="#5b3a1e"/>
-    <line x1="1020" y1="470" x2="1012" y2="720" stroke="#5a3517" stroke-width="7" stroke-linecap="round"/>
-  </g>
-
-  <!-- María -->
-  <g>
-    <path d="M610 720 Q620 610 660 580 Q700 600 715 720Z" fill="#2f5fb3"/>
-    <path d="M640 600 Q665 640 700 650 L705 720 L640 720Z" fill="#f2efe6" opacity=".9"/>
-    <circle cx="668" cy="560" r="24" fill="#f0c49c"/>
-    <path d="M640 560 Q668 505 696 560 L702 610 Q668 585 634 610Z" fill="#7fa7e8"/>
-    <circle cx="668" cy="560" r="36" fill="none" stroke="#ffd76a" stroke-width="3" opacity=".7"/>
-  </g>
-
-  <!-- Pesebre con el Niño -->
-  <g>
-    <circle cx="800" cy="640" r="70" fill="url(#aura)" opacity=".8"/>
-    <polygon points="735,650 865,650 845,700 755,700" fill="#8a5a2b"/>
-    <path d="M735 650 l-12 70 M865 650 l12 70" stroke="#5a3517" stroke-width="7"/>
-    <path d="M740 650 q20 -16 40 -4 q20 -16 40 0 q20 -14 42 4Z" fill="#e8c35a"/>
-    <ellipse cx="800" cy="640" rx="38" ry="15" fill="#fbf4e4"/>
-    <circle cx="772" cy="636" r="12" fill="#f3cfa8"/>
-    <circle cx="772" cy="636" r="20" fill="none" stroke="#ffd76a" stroke-width="3"/>
-  </g>
-
-  <!-- Ovejas -->
-  <g fill="#f4f1ea">
-    <g transform="translate(470 690)"><circle r="20"/><circle cx="22" r="22"/><circle cx="44" r="18"/><circle cx="20" cy="-14" r="18"/><ellipse cx="-14" cy="-4" rx="11" ry="13" fill="#2b2b2b"/></g>
-    <g transform="translate(1130 700) scale(-1 1)"><circle r="18"/><circle cx="20" r="20"/><circle cx="40" r="16"/><circle cx="18" cy="-12" r="16"/><ellipse cx="-12" cy="-4" rx="10" ry="12" fill="#2b2b2b"/></g>
-  </g>
-
-  <!-- ===== Ángel (el que habla) ===== -->
-  <g id="angel">
-    <ellipse id="auraAngel" cx="800" cy="300" rx="120" ry="120" fill="url(#aura)"/>
-    <path id="alaIzq" class="ala" d="M790 290 Q720 220 690 260 Q700 280 715 285 Q690 300 705 320 Q725 320 735 315 Q725 340 750 345 Q775 330 790 310Z" fill="#ffffff" opacity=".95"/>
-    <path id="alaDer" class="ala" d="M810 290 Q880 220 910 260 Q900 280 885 285 Q910 300 895 320 Q875 320 865 315 Q875 340 850 345 Q825 330 810 310Z" fill="#ffffff" opacity=".95"/>
-    <path d="M800 268 L760 380 Q800 392 840 380Z" fill="#fff7e0"/>
-    <path d="M800 290 L772 330 M800 290 L828 330" stroke="#f2d48a" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="800" cy="258" r="22" fill="#f6d2ad"/>
-    <path d="M778 254 Q800 222 822 254 Q815 238 800 236 Q785 238 778 254Z" fill="#e8b84a"/>
-    <ellipse cx="800" cy="226" rx="24" ry="6" fill="none" stroke="#ffd76a" stroke-width="4"/>
-    <circle cx="792" cy="258" r="2.6" fill="#3b2a1a"/><circle cx="808" cy="258" r="2.6" fill="#3b2a1a"/>
-    <ellipse id="boca" cx="800" cy="268" rx="5" ry="1.6" fill="#a8463c"/>
-  </g>
-</svg>
+<div id="escena" aria-hidden="true">
+  <div id="fondo"></div>
+  <div id="halo"></div>
+  <div id="vineta"></div>
+</div>
+<div id="quienHabla">✨ Habla el Ángel</div>
+<div id="letreroFondo">🎄 ¡El pesebre habla! Toca el botón y saluda:<small>"Hola Virgen María" · "Hola San José" · "Hola Ángel" · "Hola Pastorcito"</small></div>
 
 <!-- ======================= INTERFAZ ======================= -->
 <header>
   <img src="../assets/logo-congelados-montaneros.jpg" alt="Congelados Montañeros">
-  <h1>¡Habla con el Ángel del Pesebre!<small>Congelados Montañeros · Quimbaya, Quindío</small></h1>
+  <h1>¡Habla con el Pesebre!<small>Congelados Montañeros · Quimbaya, Quindío</small></h1>
   <div id="promo">🎄 Feliz Navidad</div>
 </header>
 
 <div id="pie">Pide por WhatsApp<br><b>312 866 5881</b><br>Cra. 8 #14-16 · Quimbaya</div>
 
-<div id="burbuja"><div class="angel"><b>Ángel:</b> ¡Hola, hola! Soy el Ángel del pesebre. Toca el botón dorado y pregúntame lo que quieras sobre la Navidad. ✨</div></div>
+<div id="burbuja"><div class="angel"><b>Ángel:</b> ¡Hola, hola! Soy el Ángel del pesebre. Toca el botón dorado y saluda a quien quieras: a la Virgen María, a San José, a mí o al Pastorcito. ✨</div></div>
 
 <div id="panelHabla">
   <div id="controles">
@@ -354,19 +232,16 @@ const cfg = {
 
 /* ---------------- Decoración: estrellas, bombillos, copos ---------------- */
 (function decorar(){
-  const g = $("#estrellas"); let html = "";
-  for (let i = 0; i < 140; i++) {
-    const x = Math.random()*1600, y = Math.random()*480, r = Math.random()*1.8+.4;
-    html += `<circle class="tw" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="#fff" style="animation-delay:${(Math.random()*3).toFixed(2)}s;animation-duration:${(2+Math.random()*3).toFixed(1)}s"/>`;
+  if (new URLSearchParams(location.search).get("modo") === "fondo") document.body.classList.add("modo-fondo");
+  const esc = $("#escena");
+  for (let i = 0; i < 26; i++) {
+    const c = document.createElement("div");
+    c.className = "chispa";
+    c.style.left = Math.random()*100 + "%"; c.style.top = Math.random()*40 + "%";
+    c.style.animationDelay = (Math.random()*3).toFixed(2) + "s";
+    c.style.animationDuration = (2 + Math.random()*3).toFixed(1) + "s";
+    esc.appendChild(c);
   }
-  g.innerHTML = html;
-  const colores = ["#ff3b3b","#ffd23b","#3bff6e","#3bb7ff","#ff6bf0"];
-  let b = "";
-  for (let i = 0; i <= 22; i++) {
-    const t = i/22, x = 480 + t*640, y = 480 - (t < .5 ? t*2 : (1-t)*2)*175 + 12;
-    b += `<circle class="bombillo" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="6" fill="${colores[i%5]}" style="animation-delay:${(i%3)*.5}s"/>`;
-  }
-  $("#bombillos").innerHTML = b;
   for (let i = 0; i < 28; i++) {
     const c = document.createElement("div");
     c.className = "copo"; c.textContent = "•";
@@ -395,39 +270,71 @@ function pintarPromo(){
 }
 pintarPromo();
 
-/* ---------------- Personalidad del Ángel (prompt del sistema) ---------------- */
+/* ---------------- Personajes del pesebre ---------------- */
+const PERSONAJES = {
+  "MARÍA":      { titulo: "la Virgen María", pitch: 1.25, rate: 0.95 },
+  "JOSÉ":       { titulo: "San José",        pitch: 0.75, rate: 0.95 },
+  "ÁNGEL":      { titulo: "el Ángel",        pitch: 1.15, rate: 1.0  },
+  "PASTORCITO": { titulo: "el Pastorcito",   pitch: 1.5,  rate: 1.05 },
+};
+let personaje = "ÁNGEL";
+function normalizar(t){ return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase(); }
+function etiquetaDe(t){
+  const n = normalizar(t);
+  if (/MARIA|VIRGEN/.test(n)) return "MARÍA";
+  if (/JOSE/.test(n)) return "JOSÉ";
+  if (/ANGEL|GABRIEL/.test(n)) return "ÁNGEL";
+  if (/PASTOR/.test(n)) return "PASTORCITO";
+  return null;
+}
+function ponerPersonaje(et){
+  if (!PERSONAJES[et]) return;
+  personaje = et;
+  $("#quienHabla").textContent = "✨ Habla " + PERSONAJES[et].titulo;
+}
+
 function crearSistema(){
   const { fecha, novena } = contextoDelDia();
-  return `Eres "el Ángel del Pesebre", el personaje que habla desde el pesebre navideño de Congelados Montañeros, una salsamentaría y tienda de congelados en Quimbaya, Quindío, Colombia (Cra. 8 #14-16). Las personas te hablan en voz alta frente a una pantalla en la tienda: niños, familias, clientes y vecinos.
+  return `Eres el PESEBRE PARLANTE de Congelados Montañeros, una salsamentaría y tienda de congelados en Quimbaya, Quindío, Colombia (Cra. 8 #14-16). Las personas te hablan en voz alta frente a una pantalla en la tienda: niños, familias, clientes y vecinos. Siempre respondes en español de Colombia.
 
-CÓMO HABLAS
-- Español colombiano, cálido, alegre y respetuoso, con un toque paisa/cafetero ("¡Qué alegría!", "mijo", "con mucho gusto"), sin exagerar.
-- Tu respuesta se lee en voz alta: máximo 3 o 4 frases cortas. Sin emojis, sin listas, sin viñetas, sin markdown, sin asteriscos.
-- Escribe los precios y números en palabras para que la voz los lea bien (ej.: "trece mil ochocientos pesos").
-- Si un niño te habla, usa palabras sencillas y tiernas. Puedes preguntarle su nombre o qué le pidió al Niño Dios.
+EN EL PESEBRE VIVEN CUATRO PERSONAJES. Respondes como el personaje al que la persona saluda o nombra, en primera persona:
+- MARÍA: la Virgen María. Dulce, maternal y serena. Habla del Niño Jesús, del viaje a Belén, de la familia, del amor y de la paz. Bendice con ternura.
+- JOSÉ: San José. Amable, trabajador y protector, carpintero sencillo. Cuenta cómo buscaron posada y cómo cuida a María y al Niño.
+- ÁNGEL: el Ángel. Alegre y luminoso, anunciador de buenas noticias. Cuenta cómo anunció a los pastores el nacimiento.
+- PASTORCITO: el Pastorcito Montañero, un niño pastor alegre con acento paisa cafetero que cuida las ovejas. Es el único que conoce la tienda.
+Si nadie es nombrado, sigue hablando el último personaje; al comienzo habla el ÁNGEL. Si nombran a otro, cambias a ese.
+
+FORMATO OBLIGATORIO: empieza SIEMPRE con la etiqueta del personaje que habla, en mayúsculas y seguida de dos puntos (MARÍA:, JOSÉ:, ÁNGEL: o PASTORCITO:), y luego la respuesta. Una sola etiqueta, solo al inicio.
+
+CÓMO HABLAN
+- La respuesta se lee en voz alta: máximo 3 frases cortas. Sin emojis, sin listas, sin markdown, sin asteriscos.
+- Precios y números escritos en palabras (ej.: "trece mil ochocientos pesos").
+- Con los niños: palabras sencillas y tiernas; pueden preguntarle su nombre o qué le pidió al Niño Dios.
+- Respeto total por la fe: cuentan la Navidad como la cuenta la tradición, con sencillez. No hacen milagros, no prometen favores, no dan consejos médicos. Nada de temas para adultos, política, polémicas ni burlas. Si preguntan algo fuera de lugar, vuelven con cariño a la Navidad.
 - Si no entendiste bien (el micrófono a veces se equivoca), pide con cariño que lo repitan.
+- No pidan datos personales; si alguien los dice, no los repitan.
 
-DE QUÉ HABLAS
-- La historia de la Navidad y del nacimiento de Jesús, contada con respeto y sencillez para toda la familia. Tú eres un ángel que acompaña el pesebre; no te haces pasar por Jesús, la Virgen ni San José.
-- Tradiciones colombianas: la Novena de Aguinaldos (16 al 24 de diciembre), el Día de las Velitas (7 de diciembre), los villancicos, los aguinaldos, la natilla y los buñuelos, el alumbrado.
-- Recetas e ideas para las novenas y reuniones, recomendando productos de la tienda cuando encajen de forma natural (sin vender a la fuerza; como mucho una recomendación por respuesta).
-- La tienda: pedidos por WhatsApp al ${WHATSAPP}; horario de lunes a viernes de 8 de la mañana a 8 de la noche, sábados y domingos de 8 de la mañana a 12 del mediodía. Catálogo en internet: congeladosmontaneros-dev.github.io/catalogo.
+TRADICIONES: Novena de Aguinaldos (16 al 24 de diciembre), Día de las Velitas (7 de diciembre), villancicos ("Tutaina", "Los peces en el río", "Mi burrito sabanero"), aguinaldos, natilla, buñuelos, alumbrado.
 
-REGLAS
-- Solo recomienda productos que estén en la lista de abajo. Si preguntan por algo que no está (por ejemplo buñuelos o natilla ya hechos), di con honestidad que no lo tienes en la lista y sugiere preguntar por WhatsApp.
-- Los precios son de referencia; si alguien va a comprar, invita a confirmar por WhatsApp.
-- No pidas datos personales (teléfono, dirección, apellidos). Si alguien los dice, no los repitas.
-- Nada de temas para adultos, política, ni burlas de ninguna religión o persona. Si preguntan algo fuera de lugar, vuelve con gracia al tema de la Navidad.
-- No inventes promociones. ${cfg.promo ? `La promoción vigente que sí puedes anunciar es: "${cfg.promo}".` : "Hoy no hay una promoción especial configurada."}
+LA TIENDA: solo la recomienda el PASTORCITO. María, José y el Ángel no venden: si les preguntan por productos o precios, responde el PASTORCITO ("¡Eso se lo cuento yo!").
+- Pedidos por WhatsApp al ${WHATSAPP}. Horario: lunes a viernes de 8 de la mañana a 8 de la noche; sábados y domingos de 8 de la mañana a 12 del mediodía. Catálogo: congeladosmontaneros-dev.github.io/catalogo.
+- Solo recomienda productos de la lista de abajo, como mucho uno por respuesta. Si piden algo que no está (por ejemplo buñuelos o natilla ya hechos), di con honestidad que no aparece y sugiere preguntar por WhatsApp.
+- Los precios son de referencia: invita a confirmarlos por WhatsApp.
+- No inventes promociones. ${cfg.promo ? `La promoción vigente que sí se puede anunciar es: "${cfg.promo}".` : "Hoy no hay una promoción especial configurada."}
 
-HOY
-- Fecha: ${fecha}. ${novena}
+HOY: ${fecha}. ${novena}
 
 PRODUCTOS DE LA TIENDA (precio de referencia en pesos colombianos)
 ${CATALOGO}`;
 }
 
 /* ---------------- Modo básico (sin clave de API) ---------------- */
+const SALUDOS = {
+  "MARÍA": "Hola, mi niño querido. Soy María. Qué alegría que vengas a visitar a mi hijito Jesús, que duerme aquí en el pesebre. Que el Niño Dios te llene de paz en esta Navidad.",
+  "JOSÉ": "Hola, amiguito. Habla José. Caminamos mucho hasta Belén y no encontramos posada, pero aquí en este pesebre nació el Niño Jesús. Gracias por venir a visitarnos.",
+  "ÁNGEL": "¡Aquí el Ángel! Te traigo una gran alegría: ha nacido el Niño Jesús en Belén. ¿Quieres que te cuente cómo se lo anuncié a los pastores?",
+  "PASTORCITO": "¡Quiubo! Soy el Pastorcito Montañero y cuido las ovejitas del pesebre. Si quieres algo rico para la novena, pídelo por WhatsApp al tres doce, ochocientos sesenta y seis, cincuenta y ocho, ochenta y uno.",
+};
 const BASICO = [
   [/hola|buenas|buenos/, "¡Hola, hola! Qué alegría que vengas a visitar el pesebre. Soy el Ángel y estoy aquí para contarte cosas bonitas de la Navidad. ¿Quieres que te cuente la historia del Niño Dios?"],
   [/historia|naci|jes[uú]s|ni[nñ]o dios|bel[eé]n/, "Hace mucho tiempo, María y José viajaron a Belén. No encontraron posada y el Niño Jesús nació en un humilde pesebre, entre el buey y la mula. Una estrella grande guió a los pastores y a los reyes magos para conocerlo."],
@@ -441,9 +348,15 @@ const BASICO = [
   [/gracias|chao|adi[oó]s/, "¡Con mucho gusto! Que Dios te bendiga y tengas una feliz Navidad. Te esperamos en Congelados Montañeros."],
 ];
 function respuestaBasica(t){
+  const et = etiquetaDe(t);
   const s = t.toLowerCase();
-  for (const [re, r] of BASICO) if (re.test(s)) return r;
-  return "¡Qué pregunta tan bonita! Te cuento que en Congelados Montañeros estamos de fiesta navideña. Pregúntame por la historia del pesebre, la novena, un villancico o ideas para la comida de la novena.";
+  for (const [re, r] of BASICO) if (re.test(s) && !/^hola|buenas|buenos/.test(re.source)) {
+    const quien = /precio|cuesta|vale|empanada|whats|pedido|horario|receta|comida/.test(s) ? "PASTORCITO" : (et || personaje);
+    return [quien, r];
+  }
+  if (et) return [et, SALUDOS[et]];
+  for (const [re, r] of BASICO) if (re.test(s)) return [personaje, r];
+  return [personaje, "¡Qué pregunta tan bonita! Puedes saludar a la Virgen María, a San José, al Ángel o al Pastorcito. Pregúntanos por la historia del pesebre, la novena o un villancico."];
 }
 
 /* ---------------- Voz (hablar) ---------------- */
@@ -462,13 +375,13 @@ function vozElegida(){
       || voces[0];
 }
 
-let colaVoz = 0, bocaTimer = null;
+let colaVoz = 0;
 function decir(frase){
   frase = frase.replace(/[*_#>`]/g, "").trim();
   if (!frase) return;
   const u = new SpeechSynthesisUtterance(frase);
   const v = vozElegida(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "es-CO";
-  u.rate = 1.0; u.pitch = 1.15;
+  const pj = PERSONAJES[personaje]; u.rate = pj.rate; u.pitch = pj.pitch;
   colaVoz++;
   u.onstart = () => ponerEstado("hablando");
   u.onend = u.onerror = () => { if (--colaVoz <= 0) { colaVoz = 0; if (!pensando) ponerEstado("listo"); } };
@@ -498,10 +411,6 @@ function ponerEstado(e){
   escena.classList.toggle("escuchando", e === "escuchando");
   $("#lblHablar").textContent = e === "escuchando" ? "Te escucho…" : e === "hablando" ? "Interrumpir" : "Toca y habla";
   estado.textContent = { escuchando:"🎧 Escuchando… habla cerquita a la pantalla", pensando:"✨ El Ángel está pensando…", hablando:"", listo:"" }[e] ?? "";
-  if (e === "hablando") {
-    clearInterval(bocaTimer);
-    bocaTimer = setInterval(() => $("#boca").setAttribute("ry", (1.5 + Math.random()*5).toFixed(1)), 110);
-  } else { clearInterval(bocaTimer); $("#boca").setAttribute("ry", "1.6"); }
   avisarEsp(e);
 }
 // Vigilante: algunos navegadores no avisan cuando termina la voz.
@@ -529,7 +438,7 @@ async function obtenerCliente(){
   }
   return cliente;
 }
-function nuevaConversacion(){ historial = []; sistema = ""; }
+function nuevaConversacion(){ historial = []; sistema = ""; ponerPersonaje("ÁNGEL"); }
 
 async function preguntarClaude(texto, hablador, mostrar){
   const c = await obtenerCliente();
@@ -547,15 +456,27 @@ async function preguntarClaude(texto, hablador, mostrar){
     system: sistema,
     messages: historial,
   });
-  let completo = "";
-  stream.on("text", (t) => { completo += t; mostrar(completo); hablador.agregar(t); });
+  // El modelo empieza con "MARÍA:", "JOSÉ:", "ÁNGEL:" o "PASTORCITO:": se lee la etiqueta y no se pronuncia.
+  let crudo = "", completo = "", etiquetaLista = false;
+  stream.on("text", (t) => {
+    if (etiquetaLista) { completo += t; mostrar(completo); hablador.agregar(t); return; }
+    crudo += t;
+    const m = crudo.match(/^\s*([A-ZÁÉÍÓÚÑa-záéíóúñ]+)\s*:/);
+    if (!m && crudo.length < 16) return;
+    etiquetaLista = true;
+    const et = m && etiquetaDe(m[1]);
+    if (et) { ponerPersonaje(et); crudo = crudo.slice(m[0].length).replace(/^\s+/, ""); }
+    completo = crudo; mostrar(completo); hablador.agregar(crudo);
+  });
   try {
     const msg = await stream.finalMessage();
     if (msg.stop_reason === "refusal") {
-      nuevaConversacion();
-      return "Mejor hablemos de la Navidad. ¿Quieres que te cuente la historia del pesebre?";
+      nuevaConversacion(); ponerPersonaje("ÁNGEL");
+      const t = "Mejor hablemos de la Navidad. ¿Quieres que te cuente la historia del pesebre?";
+      hablador.agregar(t); return t;
     }
     historial.push({ role: "assistant", content: msg.content }); // se devuelve tal cual llegó
+    if (!etiquetaLista) { completo = crudo.replace(/^\s*[A-ZÁÉÍÓÚÑ]+\s*:\s*/, ""); mostrar(completo); hablador.agregar(completo); }
     return completo;
   } catch (err) {
     historial.pop();
@@ -569,7 +490,8 @@ async function responder(texto){
   texto = texto.trim(); if (!texto) return;
   speechSynthesis.cancel(); colaVoz = 0;
   const tu = `<div class="tu">Tú: ${escaparHtml(texto)}</div>`;
-  const mostrar = (r) => { burbuja.innerHTML = `${tu}<div class="angel"><b>Ángel:</b> ${escaparHtml(r)}</div>`; burbuja.scrollTop = 1e9; };
+  const mostrar = (r) => { burbuja.innerHTML = `${tu}<div class="angel"><b>${PERSONAJES[personaje].titulo.replace(/^(la|el) /, "").replace(/^./, c => c.toUpperCase())}:</b> ${escaparHtml(r)}</div>`; burbuja.scrollTop = 1e9; };
+  const pedido = etiquetaDe(texto); if (pedido) ponerPersonaje(pedido);
   mostrar("…");
   pensando = true; ponerEstado("pensando");
   const hablador = crearHablador();
@@ -580,7 +502,7 @@ async function responder(texto){
     console.error(err);
     estado.textContent = "⚠ Sin conexión con la IA, uso respuestas básicas.";
   }
-  if (r === null) { r = respuestaBasica(texto); hablador.agregar(r); }
+  if (r === null) { const [et, txt] = respuestaBasica(texto); ponerPersonaje(et); r = txt; hablador.agregar(r); }
   mostrar(r);
   hablador.terminar();
   pensando = false; ultimaActividad = Date.now();
