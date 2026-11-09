@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habla con el Pesebre · Congelados Montañeros</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --oro:#ffd76a; --oro2:#ffb627; --noche1:#060b26; --noche2:#14204f; --noche3:#2b2f6b;
+    --crema:#fff6e3; --verde:#1f6b3a; --rojo:#c8102e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--noche1);color:var(--crema);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;user-select:none}
+  #escena{position:fixed;inset:0;width:100%;height:100%}
+  /* ---------- Animaciones de la escena ---------- */
+  .tw{animation:titilar 3s ease-in-out infinite}
+  @keyframes titilar{0%,100%{opacity:.25}50%{opacity:1}}
+  #estrella{transform-origin:800px 120px;animation:latido 4s ease-in-out infinite}
+  @keyframes latido{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  #rayos{transform-origin:800px 120px;animation:girar 60s linear infinite}
+  @keyframes girar{to{transform:rotate(360deg)}}
+  #fugaz{animation:fugaz 9s ease-in infinite;opacity:0}
+  @keyframes fugaz{0%,82%{transform:translate(0,0);opacity:0}85%{opacity:1}100%{transform:translate(-520px,260px);opacity:0}}
+  #angel{animation:flotar 5s ease-in-out infinite}
+  @keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .ala{transform-box:fill-box}
+  #alaIzq{transform-origin:100% 30%}
+  #alaDer{transform-origin:0% 30%}
+  .hablando #alaIzq{animation:aleteoI .5s ease-in-out infinite}
+  .hablando #alaDer{animation:aleteoD .5s ease-in-out infinite}
+  @keyframes aleteoI{50%{transform:rotate(-14deg)}}
+  @keyframes aleteoD{50%{transform:rotate(14deg)}}
+  #auraAngel{opacity:.35;transition:opacity .4s}
+  .hablando #auraAngel,.escuchando #auraAngel{opacity:1;animation:aura 1.2s ease-in-out infinite}
+  @keyframes aura{50%{transform:scale(1.15)}}
+  #auraAngel{transform-box:fill-box;transform-origin:center}
+  .bombillo{animation:bombillo 1.6s steps(1) infinite}
+  @keyframes bombillo{50%{opacity:.2}}
+  #luzPesebre{animation:vela 3s ease-in-out infinite}
+  @keyframes vela{50%{opacity:.75}}
+  .copo{position:fixed;top:-10px;color:#fff;opacity:.7;pointer-events:none;animation:caer linear infinite}
+  @keyframes caer{to{transform:translateY(110vh) translateX(40px)}}
+
+  /* ---------- Interfaz ---------- */
+  header{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:14px;
+    padding:14px 22px;background:linear-gradient(#0009,#0000);z-index:5}
+  header img{width:58px;height:58px;border-radius:50%;border:3px solid var(--oro);object-fit:cover}
+  header h1{font-size:clamp(18px,2.4vw,30px);font-weight:800;letter-spacing:.3px;text-shadow:0 2px 8px #000}
+  header h1 small{display:block;font-size:.55em;font-weight:500;color:var(--oro)}
+  #promo{margin-left:auto;background:var(--rojo);color:#fff;padding:8px 16px;border-radius:999px;
+    font-weight:700;font-size:clamp(13px,1.4vw,18px);box-shadow:0 4px 14px #0007;max-width:42vw;text-align:center}
+  #panelHabla{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(860px,94vw);z-index:5;
+    display:flex;flex-direction:column;align-items:center;gap:8px}
+  #burbuja{position:fixed;left:2.2vw;top:16vh;width:min(29vw,520px);max-height:56vh;overflow:auto;z-index:5;
+    background:#0b1233eb;border:2px solid #ffd76a99;border-radius:24px;padding:18px 22px;
+    font-size:clamp(16px,1.75vw,26px);line-height:1.38;box-shadow:0 10px 40px #000a}
+  #burbuja::after{content:"";position:fixed;left:calc(2.2vw + min(29vw,520px) - 2px);top:24vh;border:16px solid transparent;
+    border-left:22px solid #ffd76a99}
+  #burbuja .tu{color:#9fd3ff;font-size:.8em;margin-bottom:8px}
+  #burbuja .angel b{color:var(--oro)}
+  #controles{display:flex;gap:12px;align-items:center;width:100%}
+  @media (max-aspect-ratio:4/3){
+    #burbuja{left:3vw;right:3vw;width:auto;top:auto;bottom:130px;max-height:30vh}
+    #burbuja::after{display:none}
+  }
+  #btnHablar{flex:0 0 auto;display:flex;align-items:center;gap:12px;border:0;cursor:pointer;
+    background:linear-gradient(180deg,var(--oro),var(--oro2));color:#3a2200;font-weight:900;
+    font-size:clamp(18px,2.2vw,28px);padding:16px 30px;border-radius:999px;box-shadow:0 6px 24px #ffb62777}
+  #btnHablar .mic{font-size:1.3em}
+  .escuchando #btnHablar{background:linear-gradient(180deg,#ff6b6b,#c8102e);color:#fff;animation:pulso 1s infinite}
+  @keyframes pulso{50%{box-shadow:0 0 0 18px #c8102e33}}
+  #texto{flex:1;min-width:0;font-size:clamp(15px,1.6vw,20px);padding:14px 18px;border-radius:999px;border:2px solid #ffffff33;
+    background:#0b1233cc;color:#fff;outline:none}
+  #texto:focus{border-color:var(--oro)}
+  #estado{font-size:14px;color:#ffffffb0;text-align:center;min-height:18px}
+  #pie{position:fixed;right:16px;top:86px;z-index:5;text-align:right;font-size:clamp(12px,1.2vw,16px);
+    background:#0008;padding:8px 14px;border-radius:14px;line-height:1.4}
+  #pie b{color:#7dff9b}
+  #btnConfig{position:fixed;left:12px;bottom:12px;z-index:6;background:#0006;border:0;color:#fff6;
+    font-size:22px;border-radius:50%;width:40px;height:40px;cursor:pointer}
+  #config{position:fixed;inset:0;background:#000c;z-index:10;display:none;align-items:center;justify-content:center}
+  #config.abierto{display:flex}
+  #config form{background:#141a3d;border:2px solid var(--oro);border-radius:18px;padding:24px;width:min(560px,94vw);
+    max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:12px;user-select:text}
+  #config h2{color:var(--oro)}
+  #config label{font-size:14px;display:flex;flex-direction:column;gap:4px}
+  #config input,#config select,#config textarea{font-size:15px;padding:9px;border-radius:8px;border:1px solid #fff4;background:#0b1028;color:#fff}
+  #config .fila{display:flex;gap:10px;justify-content:flex-end}
+  #config button{padding:10px 18px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+  #config .nota{font-size:12px;color:#ffffffa0;line-height:1.4}
+</style>
+</head>
+<body>
+
+<!-- ======================= ESCENA DEL PESEBRE ======================= -->
+<svg id="escena" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050922"/><stop offset=".55" stop-color="#16225a"/><stop offset="1" stop-color="#3a3f86"/>
+    </linearGradient>
+    <radialGradient id="brillo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff8d0"/><stop offset=".25" stop-color="#ffd76a" stop-opacity=".8"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="calido" cx=".5" cy=".6" r=".6">
+      <stop offset="0" stop-color="#ffcf7a" stop-opacity=".95"/><stop offset=".6" stop-color="#ff9f3a" stop-opacity=".35"/><stop offset="1" stop-color="#ff9f3a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fffbe6" stop-opacity=".9"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="madera" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a3517"/><stop offset=".5" stop-color="#7a4a22"/><stop offset="1" stop-color="#4d2c12"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <g id="estrellas"></g>
+  <g id="fugaz"><line x1="1450" y1="60" x2="1520" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+
+  <!-- Estrella de Belén -->
+  <circle cx="800" cy="120" r="170" fill="url(#brillo)" opacity=".55"/>
+  <g id="rayos" opacity=".35">
+    <path d="M800 120 L770 -200 L830 -200Z M800 120 L1120 90 L1120 150Z M800 120 L830 440 L770 440Z M800 120 L480 150 L480 90Z" fill="#ffe7a0"/>
+  </g>
+  <g id="estrella">
+    <path d="M800 50 L815 105 L870 120 L815 135 L800 190 L785 135 L730 120 L785 105Z" fill="#fff6c9"/>
+    <path d="M800 85 L808 112 L835 120 L808 128 L800 155 L792 128 L765 120 L792 112Z" fill="#fff"/>
+  </g>
+  <!-- Rayo de luz hacia el pesebre -->
+  <path d="M790 150 L700 640 L900 640 L810 150Z" fill="#ffe9a8" opacity=".07"/>
+
+  <!-- Montañas del Quindío -->
+  <path d="M0 560 Q160 430 330 520 T680 480 T1020 510 T1340 450 T1600 520 V900 H0Z" fill="#1b2a5c"/>
+  <path d="M0 620 Q200 520 420 600 T860 570 T1250 600 T1600 580 V900 H0Z" fill="#163a3a"/>
+  <!-- Palmas de cera -->
+  <g stroke="#0e2a26" stroke-width="5" fill="#0e2a26">
+    <line x1="170" y1="610" x2="185" y2="400"/><path d="M185 400 q-50 -10 -80 25 q45 -15 80 -20 q-30 -40 -10 -70 q10 40 15 65 q30 -40 70 -40 q-40 20 -60 45 q50 0 70 30 q-40 -20 -85 -30Z"/>
+    <line x1="1390" y1="600" x2="1375" y2="370"/><path d="M1375 370 q-50 -10 -80 25 q45 -15 80 -20 q-30 -40 -10 -70 q10 40 15 65 q30 -40 70 -40 q-40 20 -60 45 q50 0 70 30 q-40 -20 -85 -30Z"/>
+    <line x1="1490" y1="620" x2="1500" y2="450"/><path d="M1500 450 q-40 -8 -64 20 q36 -12 64 -16 q-24 -32 -8 -56 q8 32 12 52 q24 -32 56 -32 q-32 16 -48 36 q40 0 56 24 q-32 -16 -68 -24Z"/>
+  </g>
+  <!-- Suelo -->
+  <path d="M0 700 Q400 660 800 690 T1600 680 V900 H0Z" fill="#0f2b22"/>
+
+  <!-- ===== Pesebre (establo) ===== -->
+  <ellipse id="luzPesebre" cx="800" cy="600" rx="420" ry="230" fill="url(#calido)"/>
+  <g id="establo">
+    <polygon points="520,470 1080,470 1080,720 520,720" fill="#2a170a"/>
+    <rect x="530" y="470" width="26" height="250" fill="url(#madera)"/>
+    <rect x="1044" y="470" width="26" height="250" fill="url(#madera)"/>
+    <!-- Techo de paja -->
+    <polygon points="470,480 800,300 1130,480 1100,500 800,335 500,500" fill="#b07a2a"/>
+    <polygon points="470,480 800,300 1130,480" fill="none" stroke="#7a5214" stroke-width="10" stroke-linejoin="round"/>
+    <g stroke="#d9a54a" stroke-width="3" opacity=".6">
+      <line x1="560" y1="440" x2="600" y2="420"/><line x1="640" y1="400" x2="690" y2="372"/><line x1="900" y1="372" x2="950" y2="400"/><line x1="1000" y1="420" x2="1040" y2="440"/>
+    </g>
+    <!-- Alumbrado navideño -->
+    <g id="bombillos"></g>
+  </g>
+
+  <!-- Buey y mula -->
+  <g>
+    <ellipse cx="985" cy="600" rx="70" ry="45" fill="#6b4a32"/>
+    <ellipse cx="930" cy="575" rx="34" ry="28" fill="#7a5638"/>
+    <path d="M905 552 q-14 -24 -2 -36 M952 552 q14 -24 2 -36" stroke="#e8dcc0" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="920" cy="572" r="4" fill="#111"/><ellipse cx="912" cy="592" rx="12" ry="8" fill="#a07a58"/>
+    <ellipse cx="640" cy="605" rx="62" ry="40" fill="#7c7c86"/>
+    <ellipse cx="690" cy="575" rx="26" ry="32" fill="#8b8b95"/>
+    <path d="M680 548 l-8 -38 l14 4z M700 548 l6 -38 l-14 6z" fill="#8b8b95"/>
+    <circle cx="696" cy="570" r="4" fill="#111"/><ellipse cx="700" cy="598" rx="12" ry="9" fill="#b5b5bd"/>
+  </g>
+
+  <!-- José -->
+  <g>
+    <path d="M915 720 L935 560 Q955 520 985 560 L1005 720Z" fill="#7a4b26"/>
+    <path d="M930 600 L1010 610 L1000 640 L925 630Z" fill="#a8743f" opacity=".7"/>
+    <circle cx="960" cy="525" r="26" fill="#e3b38a"/>
+    <path d="M934 520 Q960 470 986 520 L990 560 Q960 545 930 560Z" fill="#b8865a"/>
+    <path d="M944 535 Q960 565 976 535 Q972 550 960 556 Q948 550 944 535Z" fill="#5b3a1e"/>
+    <line x1="1020" y1="470" x2="1012" y2="720" stroke="#5a3517" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- María -->
+  <g>
+    <path d="M610 720 Q620 610 660 580 Q700 600 715 720Z" fill="#2f5fb3"/>
+    <path d="M640 600 Q665 640 700 650 L705 720 L640 720Z" fill="#f2efe6" opacity=".9"/>
+    <circle cx="668" cy="560" r="24" fill="#f0c49c"/>
+    <path d="M640 560 Q668 505 696 560 L702 610 Q668 585 634 610Z" fill="#7fa7e8"/>
+    <circle cx="668" cy="560" r="36" fill="none" stroke="#ffd76a" stroke-width="3" opacity=".7"/>
+  </g>
+
+  <!-- Pesebre con el Niño -->
+  <g>
+    <circle cx="800" cy="640" r="70" fill="url(#aura)" opacity=".8"/>
+    <polygon points="735,650 865,650 845,700 755,700" fill="#8a5a2b"/>
+    <path d="M735 650 l-12 70 M865 650 l12 70" stroke="#5a3517" stroke-width="7"/>
+    <path d="M740 650 q20 -16 40 -4 q20 -16 40 0 q20 -14 42 4Z" fill="#e8c35a"/>
+    <ellipse cx="800" cy="640" rx="38" ry="15" fill="#fbf4e4"/>
+    <circle cx="772" cy="636" r="12" fill="#f3cfa8"/>
+    <circle cx="772" cy="636" r="20" fill="none" stroke="#ffd76a" stroke-width="3"/>
+  </g>
+
+  <!-- Ovejas -->
+  <g fill="#f4f1ea">
+    <g transform="translate(470 690)"><circle r="20"/><circle cx="22" r="22"/><circle cx="44" r="18"/><circle cx="20" cy="-14" r="18"/><ellipse cx="-14" cy="-4" rx="11" ry="13" fill="#2b2b2b"/></g>
+    <g transform="translate(1130 700) scale(-1 1)"><circle r="18"/><circle cx="20" r="20"/><circle cx="40" r="16"/><circle cx="18" cy="-12" r="16"/><ellipse cx="-12" cy="-4" rx="10" ry="12" fill="#2b2b2b"/></g>
+  </g>
+
+  <!-- ===== Ángel (el que habla) ===== -->
+  <g id="angel">
+    <ellipse id="auraAngel" cx="800" cy="300" rx="120" ry="120" fill="url(#aura)"/>
+    <path id="alaIzq" class="ala" d="M790 290 Q720 220 690 260 Q700 280 715 285 Q690 300 705 320 Q725 320 735 315 Q725 340 750 345 Q775 330 790 310Z" fill="#ffffff" opacity=".95"/>
+    <path id="alaDer" class="ala" d="M810 290 Q880 220 910 260 Q900 280 885 285 Q910 300 895 320 Q875 320 865 315 Q875 340 850 345 Q825 330 810 310Z" fill="#ffffff" opacity=".95"/>
+    <path d="M800 268 L760 380 Q800 392 840 380Z" fill="#fff7e0"/>
+    <path d="M800 290 L772 330 M800 290 L828 330" stroke="#f2d48a" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="800" cy="258" r="22" fill="#f6d2ad"/>
+    <path d="M778 254 Q800 222 822 254 Q815 238 800 236 Q785 238 778 254Z" fill="#e8b84a"/>
+    <ellipse cx="800" cy="226" rx="24" ry="6" fill="none" stroke="#ffd76a" stroke-width="4"/>
+    <circle cx="792" cy="258" r="2.6" fill="#3b2a1a"/><circle cx="808" cy="258" r="2.6" fill="#3b2a1a"/>
+    <ellipse id="boca" cx="800" cy="268" rx="5" ry="1.6" fill="#a8463c"/>
+  </g>
+</svg>
+
+<!-- ======================= INTERFAZ ======================= -->
+<header>
+  <img src="../assets/logo-congelados-montaneros.jpg" alt="Congelados Montañeros">
+  <h1>¡Habla con el Ángel del Pesebre!<small>Congelados Montañeros · Quimbaya, Quindío</small></h1>
+  <div id="promo">🎄 Feliz Navidad</div>
+</header>
+
+<div id="pie">Pide por WhatsApp<br><b>312 866 5881</b><br>Cra. 8 #14-16 · Quimbaya</div>
+
+<div id="burbuja"><div class="angel"><b>Ángel:</b> ¡Hola, hola! Soy el Ángel del pesebre. Toca el botón dorado y pregúntame lo que quieras sobre la Navidad. ✨</div></div>
+
+<div id="panelHabla">
+  <div id="controles">
+    <button id="btnHablar" type="button"><span class="mic">🎤</span><span id="lblHablar">Toca y habla</span></button>
+    <input id="texto" type="text" placeholder="…o escribe tu pregunta aquí y presiona Enter" autocomplete="off">
+  </div>
+  <div id="estado"></div>
+</div>
+
+<button id="btnConfig" title="Configuración (tecla C)">⚙</button>
+
+<div id="config">
+  <form id="formConfig">
+    <h2>⚙ Configuración del pesebre</h2>
+    <label>Clave de la API de Claude (Anthropic)
+      <input id="cfgKey" type="password" placeholder="sk-ant-..." autocomplete="off">
+    </label>
+    <p class="nota">La clave se guarda solo en este computador (localStorage), nunca en GitHub. Sin clave, el Ángel responde en <b>modo básico</b> con respuestas ya escritas.<br>Usa una clave dedicada para el pesebre, con un límite de gasto mensual configurado en console.anthropic.com.</p>
+    <label>Promoción del día (el Ángel la menciona)
+      <textarea id="cfgPromo" rows="2" placeholder="Ej: 10 empanadas de carne + Coca-Cola 1 L por $17.500"></textarea>
+    </label>
+    <label>Voz del Ángel
+      <select id="cfgVoz"></select>
+    </label>
+    <label>IP del ESP32 para luces (opcional)
+      <input id="cfgEsp" type="text" placeholder="Ej: 192.168.1.50">
+    </label>
+    <p class="nota">Si pones la IP, la página avisa al ESP32 cuando el Ángel escucha o habla (para prender la estrella o las luces). Funciona abriendo el archivo desde el computador, no desde GitHub Pages.</p>
+    <div class="fila">
+      <button type="button" id="cfgProbar">🔊 Probar voz</button>
+      <button type="button" id="cfgCerrar">Cerrar</button>
+      <button type="submit" style="background:var(--oro);color:#3a2200">Guardar</button>
+    </div>
+    <p class="nota">Atajos: <b>Espacio</b> = hablar · <b>C</b> = configuración · <b>F</b> = pantalla completa · <b>R</b> = reiniciar conversación</p>
+  </form>
+</div>
+
+<script type="module">
+/* =====================================================================
+   Pesebre interactivo · Congelados Montañeros
+   - Escucha con el micrófono (reconocimiento de voz de Chrome/Edge)
+   - Piensa con Claude (si hay clave) o con respuestas básicas (sin clave)
+   - Habla con la voz del navegador y anima al Ángel
+   ===================================================================== */
+
+const MODEL = "claude-opus-5-5";
+const WHATSAPP = "312 866 5881";
+const MAX_TURNOS = 10;            // después de esto se empieza una conversación nueva
+const REINICIO_INACTIVO_MS = 90_000; // 90 s sin hablar = llegó otra persona
+
+const CATALOGO = `- Arepas con queso Montañeras x 6 (Congelados): x 6 $11.000
+- Panzerottis x 10 (Congelados): Pollo $30.000; Jamón $30.000; Tocineta $30.000; Ranchero $30.000
+- Panzerotti por unidad (Congelados): Hawaiano $3.500; Ranchero maíz $3.500; Jamón $3.000; Ranchero $3.000
+- Empanadas x 10 (Congelados): Carne $13.800; Pollo $14.000; Queso $14.000
+- Empanada por unidad (Congelados): Carne $1.380; Pollo $1.400; Queso $1.400
+- Deditos x 10 (Congelados): Jamón $14.000; Hawaiano $14.000; Arequipe $14.000; Bocadillo $14.000
+- Papa prefrita congelada (Congelados): Libra (500 g) $6.000; 1 kg $10.600; 2.5 kg $25.900
+- Pulpa de fruta El Lucero 300 g (Pulpas de fruta): Mora $2.500; Piña $2.500; Uva $2.500; Mango $3.000
+- Concentrado de coco (Pulpas de fruta): Unidad $3.500
+- Chorizo santarrosano Chorizazos (Embutidos): x 2 $3.900; x 5 $8.400; x 10 $16.500
+- Salchichas Ranchera x 3 (Embutidos): x 3 $5.300
+- Salchicha Mi Rancho Chorizazos x 5 (Embutidos): x 5 $5.100
+- Salchicha manguera Chorizazos x 9 (Embutidos): x 9 $12.800
+- Carne de hamburguesa Chorizazos (Embutidos): x 2 $4.500; x 5 $9.500
+- Jamón Chorizazos 250 g (Embutidos): 250 g $6.400
+- Salchicha tradicional Zenú 450 g (Embutidos): 450 g $18.000
+- Salchicha para perro Zenú x 12 (Embutidos): x 12 $20.900
+- Jamón Ideal Zenú 400 g (Embutidos): 21 tajadas $14.200
+- Tocineta Rica (Embutidos): x 6 tajadas $10.300; x 10 tajadas $19.900
+- Salchicha manguera Rica (Embutidos): x 5 $6.400; x 10 $12.000
+- Carne de hamburguesa Rica 900 g (Embutidos): 900 g $29.100
+- Queso molido (Lácteos): Unidad $10.800
+- Coca-Cola (Bebidas): Lata 269 ml $2.800; 300 ml $3.400; 400 ml $3.000; 1 L $4.500
+- Quatro toronja (Bebidas): 400 ml $2.700; 1.5 L $4.500
+- Agua Brisa 600 ml (Bebidas): Natural $1.600; Manzana con gas $2.500
+- Powerade 500 ml (Bebidas): 500 ml $3.800
+- Electrolit 625 ml (Bebidas): Maracuyá $9.100; Mora azul $9.100; Ponche de frutas $9.100; Fresa $9.100
+- Gaseosas Postobón (Bebidas): Colombiana 400 ml $2.600; Manzana 400 ml $2.600; Manzana 1.25 L $3.500; Naranja 1.75 L $4.500
+- Pepsi 1,25 L (Bebidas): 1.25 L $3.500
+- H2OH! 600 ml (Bebidas): Maracuyá $3.200; Lima limón $3.200
+- Jugo Hit (Bebidas): Frutas tropicales $3.000; Naranja piña $3.000
+- Gatorade (Bebidas): Unidad $4.000
+- Soda Schweppes 300 ml (Bebidas): 300 ml $2.700
+- Salsas La Constancia 80 g (Salsas y mermeladas): Rosada $2.000; BBQ $2.200
+- Mermelada La Constancia 200 g (Salsas y mermeladas): Fresa $6.050; Mora $5.800; Piña $5.800
+- Mezcla para torta Corona 450 g (Repostería): Chocolate $14.500; Veteada $14.500
+- Mezcla Brownies Corona 350 g (Repostería): 350 g $10.500
+- Pancakes, waffles y crepes Corona 320 g (Repostería): 320 g $9.800
+- Chips de chocolate Corona 250 g (Repostería): 250 g $11.100
+- Chantilly en polvo Corona 80 g (Repostería): 80 g $6.950
+- Chocolatinas Jet (Mecato): Tradicional $1.000; Cookies & cream $1.000; Más leche $1.000; Burbuja $1.000
+- Bon Bon Bum x 24 (Mecato): Surtido $11.800; Rojo fresa $11.800
+- La Especial mix arándanos (Mecato): Unidad $3.200
+- Tikys Golochips (Mecato): Unidad $1.600
+- Gomitas Grissly 72 g (Mecato): Clásicas $2.200; Gusanos ácidos $2.200
+- Maní Jumbo 35 g (Mecato): 35 g $3.900
+- Dulces por unidad (Mecato): Chocolatina Gol $1.500; Bombón Supercoco $800; Bon Bon Bum $700
+- Takis (Mecato): Fuego $3.600; Blue 50 g $3.600
+- Rosquitas Pa' mi gente (Mecato): Unidad $1.600
+- Dulces Fiesta Mix (Mecato): x 90 unidades $9.900; Amarillo x 160 unidades $20.000
+- Saltín Noel taco día (Galletas): Tradicional $2.200; Queso y mantequilla $3.200
+- Wafer Capri vainilla x 24 (Galletas): x 24 $7.900
+- Galletas Festival (Galletas): Limón $1.600; Chocolate $1.600; Paquete x 12 $16.200
+- Galleta Mr. Brown (Galletas): Unidad $2.000
+- Ponqués Bimbo (Panadería y ponqués): Tajada vainilla 60 g $2.200; Panqué tajada $2.200; Bimbolete $2.200; Ponqué casero $6.500
+- Buenazo (Panadería y ponqués): Croissant mora $2.500; Croissant chocolate $2.600; Croissant arequipe $2.600; Tajada azul $2.500
+- Submarino (Panadería y ponqués): Mora $1.900; Fresa $1.900; Arequipe $1.900
+- Pingüinos azules x 3 (Panadería y ponqués): x 3 $4.600
+- Brownie (Panadería y ponqués): Chocolate $3.500; Arequipe $3.500
+- Pan tajado Bimbo (Panadería y ponqués): Paquete $6.600
+- Helados y paletas (Helados): Paleta Aloha limón $2.000; Casero de coco $2.500; Paleta Choco Listo $2.500; Chococono $3.500`;
+
+const $ = (s) => document.querySelector(s);
+const escena = $("#escena"), burbuja = $("#burbuja"), estado = $("#estado");
+const cfg = {
+  get key(){ return localStorage.getItem("pesebre.key") || ""; },
+  get promo(){ return localStorage.getItem("pesebre.promo") || ""; },
+  get voz(){ return localStorage.getItem("pesebre.voz") || ""; },
+  get esp(){ return localStorage.getItem("pesebre.esp") || ""; },
+};
+
+/* ---------------- Decoración: estrellas, bombillos, copos ---------------- */
+(function decorar(){
+  const g = $("#estrellas"); let html = "";
+  for (let i = 0; i < 140; i++) {
+    const x = Math.random()*1600, y = Math.random()*480, r = Math.random()*1.8+.4;
+    html += `<circle class="tw" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="#fff" style="animation-delay:${(Math.random()*3).toFixed(2)}s;animation-duration:${(2+Math.random()*3).toFixed(1)}s"/>`;
+  }
+  g.innerHTML = html;
+  const colores = ["#ff3b3b","#ffd23b","#3bff6e","#3bb7ff","#ff6bf0"];
+  let b = "";
+  for (let i = 0; i <= 22; i++) {
+    const t = i/22, x = 480 + t*640, y = 480 - (t < .5 ? t*2 : (1-t)*2)*175 + 12;
+    b += `<circle class="bombillo" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="6" fill="${colores[i%5]}" style="animation-delay:${(i%3)*.5}s"/>`;
+  }
+  $("#bombillos").innerHTML = b;
+  for (let i = 0; i < 28; i++) {
+    const c = document.createElement("div");
+    c.className = "copo"; c.textContent = "•";
+    c.style.left = Math.random()*100 + "vw";
+    c.style.fontSize = (6 + Math.random()*10) + "px";
+    c.style.animationDuration = (8 + Math.random()*10) + "s";
+    c.style.animationDelay = (-Math.random()*18) + "s";
+    document.body.appendChild(c);
+  }
+})();
+
+/* ---------------- Fecha, novena y promo ---------------- */
+function contextoDelDia(){
+  const hoy = new Date();
+  const fecha = hoy.toLocaleDateString("es-CO", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  let novena = "";
+  if (hoy.getMonth() === 11 && hoy.getDate() >= 16 && hoy.getDate() <= 24) {
+    novena = `Hoy es el día ${hoy.getDate() - 15} de la Novena de Aguinaldos.`;
+  } else if (hoy.getMonth() === 11 && hoy.getDate() < 16) {
+    novena = `Faltan ${16 - hoy.getDate()} días para que empiece la Novena de Aguinaldos (16 de diciembre).`;
+  }
+  return { fecha, novena };
+}
+function pintarPromo(){
+  $("#promo").textContent = cfg.promo ? "🎁 " + cfg.promo : "🎄 ¡Feliz Navidad les desea Congelados Montañeros!";
+}
+pintarPromo();
+
+/* ---------------- Personalidad del Ángel (prompt del sistema) ---------------- */
+function crearSistema(){
+  const { fecha, novena } = contextoDelDia();
+  return `Eres "el Ángel del Pesebre", el personaje que habla desde el pesebre navideño de Congelados Montañeros, una salsamentaría y tienda de congelados en Quimbaya, Quindío, Colombia (Cra. 8 #14-16). Las personas te hablan en voz alta frente a una pantalla en la tienda: niños, familias, clientes y vecinos.
+
+CÓMO HABLAS
+- Español colombiano, cálido, alegre y respetuoso, con un toque paisa/cafetero ("¡Qué alegría!", "mijo", "con mucho gusto"), sin exagerar.
+- Tu respuesta se lee en voz alta: máximo 3 o 4 frases cortas. Sin emojis, sin listas, sin viñetas, sin markdown, sin asteriscos.
+- Escribe los precios y números en palabras para que la voz los lea bien (ej.: "trece mil ochocientos pesos").
+- Si un niño te habla, usa palabras sencillas y tiernas. Puedes preguntarle su nombre o qué le pidió al Niño Dios.
+- Si no entendiste bien (el micrófono a veces se equivoca), pide con cariño que lo repitan.
+
+DE QUÉ HABLAS
+- La historia de la Navidad y del nacimiento de Jesús, contada con respeto y sencillez para toda la familia. Tú eres un ángel que acompaña el pesebre; no te haces pasar por Jesús, la Virgen ni San José.
+- Tradiciones colombianas: la Novena de Aguinaldos (16 al 24 de diciembre), el Día de las Velitas (7 de diciembre), los villancicos, los aguinaldos, la natilla y los buñuelos, el alumbrado.
+- Recetas e ideas para las novenas y reuniones, recomendando productos de la tienda cuando encajen de forma natural (sin vender a la fuerza; como mucho una recomendación por respuesta).
+- La tienda: pedidos por WhatsApp al ${WHATSAPP}; horario de lunes a viernes de 8 de la mañana a 8 de la noche, sábados y domingos de 8 de la mañana a 12 del mediodía. Catálogo en internet: congeladosmontaneros-dev.github.io/catalogo.
+
+REGLAS
+- Solo recomienda productos que estén en la lista de abajo. Si preguntan por algo que no está (por ejemplo buñuelos o natilla ya hechos), di con honestidad que no lo tienes en la lista y sugiere preguntar por WhatsApp.
+- Los precios son de referencia; si alguien va a comprar, invita a confirmar por WhatsApp.
+- No pidas datos personales (teléfono, dirección, apellidos). Si alguien los dice, no los repitas.
+- Nada de temas para adultos, política, ni burlas de ninguna religión o persona. Si preguntan algo fuera de lugar, vuelve con gracia al tema de la Navidad.
+- No inventes promociones. ${cfg.promo ? `La promoción vigente que sí puedes anunciar es: "${cfg.promo}".` : "Hoy no hay una promoción especial configurada."}
+
+HOY
+- Fecha: ${fecha}. ${novena}
+
+PRODUCTOS DE LA TIENDA (precio de referencia en pesos colombianos)
+${CATALOGO}`;
+}
+
+/* ---------------- Modo básico (sin clave de API) ---------------- */
+const BASICO = [
+  [/hola|buenas|buenos/, "¡Hola, hola! Qué alegría que vengas a visitar el pesebre. Soy el Ángel y estoy aquí para contarte cosas bonitas de la Navidad. ¿Quieres que te cuente la historia del Niño Dios?"],
+  [/historia|naci|jes[uú]s|ni[nñ]o dios|bel[eé]n/, "Hace mucho tiempo, María y José viajaron a Belén. No encontraron posada y el Niño Jesús nació en un humilde pesebre, entre el buey y la mula. Una estrella grande guió a los pastores y a los reyes magos para conocerlo."],
+  [/novena/, "La Novena de Aguinaldos se reza del dieciséis al veinticuatro de diciembre, con oraciones, gozos y villancicos. ¡Y no puede faltar el algo! Unas empanadas calienticas y una gaseosa bien fría hacen la novena más rica."],
+  [/receta|buñuelo|natilla|comida|cocin/, "Para la novena te recomiendo algo rapidito: empanadas o panzerottis directo del congelador al aceite, con salsa rosada. Y para los niños, deditos de arequipe. Pide por WhatsApp al tres doce, ochocientos sesenta y seis, cincuenta y ocho, ochenta y uno."],
+  [/precio|cu[aá]nto|vale|cuesta|empanada/, "Las empanadas vienen en paquete de diez desde trece mil ochocientos pesos, y también por unidad. Para precios del día escríbenos por WhatsApp al tres doce, ochocientos sesenta y seis, cincuenta y ocho, ochenta y uno."],
+  [/whats|pedido|domicilio|pedir/, "¡Claro que sí! Haz tu pedido por WhatsApp al tres doce, ochocientos sesenta y seis, cincuenta y ocho, ochenta y uno. Con mucho gusto te atendemos."],
+  [/horario|abren|cierran|hora/, "Atendemos de lunes a viernes de ocho de la mañana a ocho de la noche, y sábados y domingos de ocho de la mañana a doce del mediodía."],
+  [/villancico|canta|canci/, "¡Vamos a cantar! Tutaina tuturumá, tutaina tuturumaina, tutaina tuturumá, turumá, tutaina tuturumaina. ¡Muy bien!"],
+  [/regalo|pap[aá] noel|pedir.*ni[nñ]o|carta/, "¡Qué bonito! Escríbele tu cartica al Niño Dios y pórtate muy juicioso. Y recuerda que el mejor regalo es compartir en familia."],
+  [/gracias|chao|adi[oó]s/, "¡Con mucho gusto! Que Dios te bendiga y tengas una feliz Navidad. Te esperamos en Congelados Montañeros."],
+];
+function respuestaBasica(t){
+  const s = t.toLowerCase();
+  for (const [re, r] of BASICO) if (re.test(s)) return r;
+  return "¡Qué pregunta tan bonita! Te cuento que en Congelados Montañeros estamos de fiesta navideña. Pregúntame por la historia del pesebre, la novena, un villancico o ideas para la comida de la novena.";
+}
+
+/* ---------------- Voz (hablar) ---------------- */
+let voces = [];
+function cargarVoces(){
+  voces = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith("es"));
+  const sel = $("#cfgVoz");
+  sel.innerHTML = voces.map(v => `<option value="${v.name}">${v.name} (${v.lang})</option>`).join("") || "<option>(sin voces en español)</option>";
+  if (cfg.voz) sel.value = cfg.voz;
+}
+speechSynthesis.onvoiceschanged = cargarVoces; cargarVoces();
+function vozElegida(){
+  return voces.find(v => v.name === cfg.voz)
+      || voces.find(v => /es[-_]CO/i.test(v.lang))
+      || voces.find(v => /es[-_](MX|US|419)/i.test(v.lang))
+      || voces[0];
+}
+
+let colaVoz = 0, bocaTimer = null;
+function decir(frase){
+  frase = frase.replace(/[*_#>`]/g, "").trim();
+  if (!frase) return;
+  const u = new SpeechSynthesisUtterance(frase);
+  const v = vozElegida(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "es-CO";
+  u.rate = 1.0; u.pitch = 1.15;
+  colaVoz++;
+  u.onstart = () => ponerEstado("hablando");
+  u.onend = u.onerror = () => { if (--colaVoz <= 0) { colaVoz = 0; if (!pensando) ponerEstado("listo"); } };
+  speechSynthesis.speak(u);
+}
+// Chrome corta las frases largas: hablamos frase por frase a medida que llegan.
+function crearHablador(){
+  let pendiente = "";
+  return {
+    agregar(txt){
+      pendiente += txt;
+      let m;
+      while ((m = pendiente.match(/^[\s\S]*?[.!?¡¿…:;](\s|$)/))) {
+        const f = m[0]; pendiente = pendiente.slice(f.length);
+        if (f.trim().length > 1) decir(f);
+      }
+    },
+    terminar(){ if (pendiente.trim()) decir(pendiente); pendiente = ""; }
+  };
+}
+
+/* ---------------- Estados visuales + ESP32 ---------------- */
+let pensando = false;
+function ponerEstado(e){
+  document.body.classList.toggle("escuchando", e === "escuchando");
+  escena.classList.toggle("hablando", e === "hablando");
+  escena.classList.toggle("escuchando", e === "escuchando");
+  $("#lblHablar").textContent = e === "escuchando" ? "Te escucho…" : e === "hablando" ? "Interrumpir" : "Toca y habla";
+  estado.textContent = { escuchando:"🎧 Escuchando… habla cerquita a la pantalla", pensando:"✨ El Ángel está pensando…", hablando:"", listo:"" }[e] ?? "";
+  if (e === "hablando") {
+    clearInterval(bocaTimer);
+    bocaTimer = setInterval(() => $("#boca").setAttribute("ry", (1.5 + Math.random()*5).toFixed(1)), 110);
+  } else { clearInterval(bocaTimer); $("#boca").setAttribute("ry", "1.6"); }
+  avisarEsp(e);
+}
+// Vigilante: algunos navegadores no avisan cuando termina la voz.
+setInterval(() => {
+  if (!pensando && !escuchando && !speechSynthesis.speaking && !speechSynthesis.pending
+      && (escena.classList.contains("hablando") || estado.textContent.includes("pensando"))) {
+    colaVoz = 0; ponerEstado("listo");
+  }
+}, 700);
+let ultimoEsp = "";
+function avisarEsp(e){
+  if (!cfg.esp || e === ultimoEsp) return;
+  ultimoEsp = e;
+  fetch(`http://${cfg.esp}/estado?e=${e}`, { mode: "no-cors" }).catch(() => {});
+}
+
+/* ---------------- Claude ---------------- */
+let cliente = null, sistema = "", historial = [], ultimaActividad = 0;
+async function obtenerCliente(){
+  if (!cfg.key) return null;
+  if (!cliente) {
+    const { default: Anthropic } = await import("https://esm.sh/@anthropic-ai/sdk");
+    // La clave vive solo en este computador (localStorage). Ver README.
+    cliente = new Anthropic({ apiKey: cfg.key, dangerouslyAllowBrowser: true });
+  }
+  return cliente;
+}
+function nuevaConversacion(){ historial = []; sistema = ""; }
+
+async function preguntarClaude(texto, hablador, mostrar){
+  const c = await obtenerCliente();
+  if (!c) return null;
+  // Conversación solo-de-agregar: el sistema y los turnos anteriores no se modifican.
+  if (Date.now() - ultimaActividad > REINICIO_INACTIVO_MS || historial.length >= MAX_TURNOS*2) nuevaConversacion();
+  if (!sistema) sistema = crearSistema();
+  historial.push({ role: "user", content: texto });
+  const stream = c.beta.messages.stream({
+    model: MODEL,
+    max_tokens: 1024, // respuestas habladas y cortas a propósito
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    output_config: { effort: "low" },
+    system: sistema,
+    messages: historial,
+  });
+  let completo = "";
+  stream.on("text", (t) => { completo += t; mostrar(completo); hablador.agregar(t); });
+  try {
+    const msg = await stream.finalMessage();
+    if (msg.stop_reason === "refusal") {
+      nuevaConversacion();
+      return "Mejor hablemos de la Navidad. ¿Quieres que te cuente la historia del pesebre?";
+    }
+    historial.push({ role: "assistant", content: msg.content }); // se devuelve tal cual llegó
+    return completo;
+  } catch (err) {
+    historial.pop();
+    throw err;
+  }
+}
+
+/* ---------------- Flujo de una pregunta ---------------- */
+function escaparHtml(s){ return s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+async function responder(texto){
+  texto = texto.trim(); if (!texto) return;
+  speechSynthesis.cancel(); colaVoz = 0;
+  const tu = `<div class="tu">Tú: ${escaparHtml(texto)}</div>`;
+  const mostrar = (r) => { burbuja.innerHTML = `${tu}<div class="angel"><b>Ángel:</b> ${escaparHtml(r)}</div>`; burbuja.scrollTop = 1e9; };
+  mostrar("…");
+  pensando = true; ponerEstado("pensando");
+  const hablador = crearHablador();
+  let r = null;
+  try {
+    r = await preguntarClaude(texto, hablador, mostrar);
+  } catch (err) {
+    console.error(err);
+    estado.textContent = "⚠ Sin conexión con la IA, uso respuestas básicas.";
+  }
+  if (r === null) { r = respuestaBasica(texto); hablador.agregar(r); }
+  mostrar(r);
+  hablador.terminar();
+  pensando = false; ultimaActividad = Date.now();
+  if (!speechSynthesis.speaking && colaVoz === 0) ponerEstado("listo");
+}
+
+/* ---------------- Micrófono ---------------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, escuchando = false;
+if (SR) {
+  rec = new SR();
+  rec.lang = "es-CO"; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
+  let final = "";
+  rec.onstart = () => { escuchando = true; final = ""; ponerEstado("escuchando"); };
+  rec.onresult = (e) => {
+    let parcial = "";
+    for (const r of e.results) { if (r.isFinal) final = r[0].transcript; else parcial += r[0].transcript; }
+    burbuja.innerHTML = `<div class="tu">Tú: ${escaparHtml(final || parcial)}…</div>`;
+  };
+  rec.onerror = (e) => { if (e.error === "not-allowed") estado.textContent = "⚠ Permite el micrófono en el navegador."; };
+  rec.onend = () => { escuchando = false; if (final) responder(final); else ponerEstado("listo"); };
+} else {
+  estado.textContent = "Este navegador no reconoce voz: usa Google Chrome o Microsoft Edge, o escribe tu pregunta.";
+}
+function botonHablar(){
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); colaVoz = 0; ponerEstado("listo"); return; }
+  if (!rec) { $("#texto").focus(); return; }
+  if (escuchando) rec.stop(); else { try { rec.start(); } catch {} }
+}
+$("#btnHablar").addEventListener("click", botonHablar);
+$("#texto").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { const t = e.target.value; e.target.value = ""; responder(t); }
+});
+
+/* ---------------- Configuración y atajos ---------------- */
+const panel = $("#config");
+function abrirConfig(){
+  $("#cfgKey").value = cfg.key; $("#cfgPromo").value = cfg.promo; $("#cfgEsp").value = cfg.esp;
+  cargarVoces(); panel.classList.add("abierto");
+}
+$("#btnConfig").onclick = abrirConfig;
+$("#cfgCerrar").onclick = () => panel.classList.remove("abierto");
+$("#cfgProbar").onclick = () => { localStorage.setItem("pesebre.voz", $("#cfgVoz").value); decir("¡Hola! Soy el Ángel del pesebre de Congelados Montañeros. ¡Feliz Navidad!"); };
+$("#formConfig").onsubmit = (e) => {
+  e.preventDefault();
+  localStorage.setItem("pesebre.key", $("#cfgKey").value.trim());
+  localStorage.setItem("pesebre.promo", $("#cfgPromo").value.trim());
+  localStorage.setItem("pesebre.voz", $("#cfgVoz").value);
+  localStorage.setItem("pesebre.esp", $("#cfgEsp").value.trim());
+  cliente = null; nuevaConversacion(); pintarPromo();
+  panel.classList.remove("abierto");
+  estado.textContent = cfg.key ? "✅ IA activada" : "Modo básico (sin IA)";
+};
+document.addEventListener("keydown", (e) => {
+  if (panel.classList.contains("abierto") || e.target.id === "texto") return;
+  if (e.code === "Space") { e.preventDefault(); botonHablar(); }
+  else if (e.key === "c" || e.key === "C") abrirConfig();
+  else if (e.key === "f" || e.key === "F") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  else if (e.key === "r" || e.key === "R") { nuevaConversacion(); burbuja.innerHTML = '<div class="angel"><b>Ángel:</b> ¡Hola! ¿Qué me quieres preguntar?</div>'; }
+});
+if (!cfg.key) estado.textContent = "Modo básico (sin IA) · presiona C para configurar";
+</script>
+</body>
+</html>
