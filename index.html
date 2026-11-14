@@ -934,7 +934,7 @@ function renderPromos(){
 
 /* ---------- Loncheras ---------- */
 const lsel={};
-const okAdd=a=>Object.keys(a).every(id=>UNITS[id]);
+const okAdd=a=>Object.keys(a).every(id=>UNITS[id]&&!AGOTADOS.includes(id));
 const sumAdd=a=>Object.entries(a).reduce((s,[id,q])=>s+UNITS[id].price*q,0);
 const ljuice={};
 const jid=L=>{const j=ljuice[L.id]||L.jdef;return UNITS[j]?j:PULPAS.find(p=>UNITS[p])};
@@ -1110,7 +1110,7 @@ const ID={panzP:"mv07mdh7hi69j",panzJ:"mv08lrd7nd0ve",panzH:"mv08p2x3btvaw",panz
   fresa:"mv1glqzvs8g5n",tortaC:"muzqut6dbfxsr",brown:"muzqew53ocn9w",panc:"muzqqsf8ya83b",chips:"muzqcp2syw5pq",chant:"muzqlog00bs03",
   jet:"mv1dfa09drr97",bonbon:"mv1hoslif9nq4",tikys:"muzpj0d0jfltn",gomi:"mv1im4t3aubs9",saltin:"muymx3tecveix",duo:"promo-duo",arepa:"arepa4",ranch:"ranchera3",
   aji:BZ("Salsa de ají","160 ml"),tomate5:BZ("Salsa de tomate","500 g"),tomate1:BZ("Salsa de tomate","1 kg"),most5:BZ("Mostaza","500 g"),ripio:BZ("Ripio cabello de ángel 800 g","Unidad")};
-const ok=id=>id&&UNITS[id];
+const ok=id=>id&&UNITS[id]&&!AGOTADOS.includes(id);
 const C=Math.ceil;
 function drinks(n,eco){const L=n*.35;if(eco)return[{id:ID.qua15,q:Math.max(1,C(L/1.5)),why:"gaseosa para todos, la opción más económica"}];
   return L<=1.5?[{id:ID.coca15,q:1,why:"bien fría para acompañar"}]:[{id:ID.coca3,q:C(L/3),why:"rinde para todos (≈350 ml por persona)"}]}
