@@ -593,7 +593,7 @@ body.open{overflow:hidden}
     <div>
       <span class="status status-m rv" data-status><i></i><span>Quimbaya, Quindío</span></span>
       <h1 class="rv">Pídelo hoy<span class="br">y te lo llevamos</span></h1>
-      <p class="lead rv">Congelados para preparar en casa, chorizo santarrosano, gaseosas siempre frías y salsas. Arma tu pedido aquí, nos llega por WhatsApp y te lo tenemos alistado en el local.</p>
+      <p class="lead rv">Congelados para preparar en casa, chorizo santarrosano, gaseosas siempre frías y salsas. Arma tu pedido aquí y nos llega por WhatsApp. Te lo llevamos a domicilio en Quimbaya o lo recoges listo en el local.</p>
       <div class="cta rv">
         <a class="btn btn-green press" href="#s-promo">Ver catálogo</a>
         <a class="btn btn-ghost press" href="#s-negocios">Precios negocio</a>
@@ -868,7 +868,7 @@ function vars(key,list,cur,attr){
 /* producto destacado de la portada */
 function renderFeat(){
   const g=DATA.groups.find(x=>x.id===FEATURED); if(!g){$("#feat").remove();return}
-  const cur=sel[g.id]||g.v[Math.min(1,g.v.length-1)].id; sel[g.id]=cur; const v=g.v.find(x=>x.id===cur);
+  const cur=sel[g.id]||(g.v.find(x=>!AGOTADOS.includes(x.id))||g.v[0]).id; sel[g.id]=cur; const v=g.v.find(x=>x.id===cur);
   $("#feat").dataset.g=g.id;
   $("#feat").innerHTML=`<span class="sticker own">Marca propia</span>
     <div class="ph"><img src="${img(v.img)}" alt="${esc(g.name)}" width="360" height="360"></div>
