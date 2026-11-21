@@ -896,7 +896,7 @@ const img=k=>IMGS[k]||"";
 const gimg=(g,v)=>img(v.img)||img((g.v.find(x=>IMGS[x.img])||{}).img);
 
 /* indice de unidades vendibles */
-const AGOTADOS=["mv08mqptaqeh7", "mv09z0p0fs02f", "mv1gikyxx1ql8", "mv1hqtltozo18", "mv1iah0mauugm", "mv1mtdiizcmvi", "mv2l0f0yfqft8", "mv8kw079ptdju", "mv8l6icwriojb", "mv8r9vamgx3tn", "mvbewgo6t2mv4", "mvbgcxyv5rzis", "mvbhwwuk98ic2", "mvbi240hwroiq", "mvff0b6c27ulb", "mvff7gc59itec", "mvff8zslqyqzb", "mvffe91rejv5i", "mvffi5j23ojem", "mvgry0pa0c049", "mvgs0xpnxsd5h", "mvgs8njhgqjcq", "mvh8u8lmow33v", "mvmnvuweook3q"];const ACTUALIZADO="12/11/2026";
+const AGOTADOS=["mv06kxh1h6egk", "mv08mqptaqeh7", "mv08st2njojqe", "mv1gikyxx1ql8", "mv1hqtltozo18", "mv1iah0mauugm", "mv1mtdiizcmvi", "mv2l0f0yfqft8", "mv8kw079ptdju", "mv8l6icwriojb", "mv8l9yvk9w2yo", "mv8r9vamgx3tn", "mvbgcxyv5rzis", "mvbhwwuk98ic2", "mvbi240hwroiq", "mvcn1b5fu27sr", "mvcqi9u4tjat5", "mvff0b6c27ulb", "mvff7gc59itec", "mvff8zslqyqzb", "mvffe91rejv5i", "mvffi5j23ojem", "mvgry0pa0c049", "mvgs0xpnxsd5h", "mvh8u8lmow33v", "mvjqewxqah63d", "mvmnvuweook3q"];const ACTUALIZADO="21/11/2026";
 const UNITS={};
 DATA.groups.forEach(g=>g.v.forEach(v=>UNITS[v.id]={name:g.name,label:v.label,price:v.price,img:IMGS[v.img]?v.img:((g.v.find(x=>IMGS[x.img])||{}).img||null),single:g.v.length===1,g:g.id}));
 DATA.biz.forEach((b,i)=>{b.v=b.v.map((v,j)=>{const id="b"+i+"_"+j;UNITS[id]={name:b.name,label:v[0],price:v[1],img:null,single:b.v.length===1};return{id,label:v[0],price:v[1]}})});
